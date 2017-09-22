@@ -21,13 +21,6 @@ import java.util.stream.Stream;
  * 8 5 9 3
  * 
  * 単純な再帰では100段程度でも長大な時間を要するので、メモ化再帰を使う。
- * 2段目に1段目+2段目の数値、3段目に1段目+2段目+3段目を計算して、真ん中の数値は2通りあるうちの大きい数値を保存する。
- * これを最下段まで繰り返す。
- * 
- * 3
- * 10 7
- * 12 14 10
- * 20 19 23 13
  *
  */
 public class PyramidRoute {
@@ -66,9 +59,17 @@ public class PyramidRoute {
     bottomToTop(pyramid2);
     end = System.currentTimeMillis();
     System.out.println("bottomToTop : " + pyramid2.get(0)[0] + ", elapsed : " + (end - start) + "ms");
-    
+
   }
 
+  /**
+   * ファイルを読み込み、一行ずつint型の配列に格納する。
+   * 配列のListをリターンする。
+   * 
+   * @param file
+   * @return fileの中身を一段ずつListにした値
+   * @throws IOException
+   */
   private static List<int[]> parseFile(File file) throws IOException {
     List<int[]> pyramid = new ArrayList<>();
     try (BufferedReader br = new BufferedReader(new FileReader(file));) {
@@ -82,6 +83,14 @@ public class PyramidRoute {
     return pyramid;
   }
 
+  /**
+   * 底辺から頂点に向かって探索する。
+   * 頂点の値が、最大値となる。
+   * 
+   * 破壊的な実装なので注意
+   * 
+   * @param pyramid
+   */
   private static void bottomToTop(List<int[]> pyramid) {
     for (int i = pyramid.size() - 1; i > 0; i--) {
       int[] current = pyramid.get(i);
@@ -93,6 +102,22 @@ public class PyramidRoute {
     }
   }
 
+  /**
+   * 頂点から底辺に向かって探索する。
+   * 底辺から最大値を探す手間が必要。
+   * 
+   * 破壊的な実装なので注意
+   * 
+   * 2段目に1段目+2段目の数値、3段目に1段目+2段目+3段目を計算して、真ん中の数値は2通りあるうちの大きい数値を保存する。
+   * これを最下段まで繰り返す。
+   * 
+   * 3
+   * 10 7
+   * 12 14 10
+   * 20 19 23 13
+   * 
+   * @param pyramid
+   */
   private static void topToBottom(List<int[]> pyramid) {
     int tempMemory;
     for (int i = 0; i < pyramid.size() - 1; i++) {
