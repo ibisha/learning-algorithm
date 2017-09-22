@@ -39,31 +39,34 @@ public class PyramidRoute {
 
     File file = new File(INPUT);
     List<int[]> pyramid = parseFile(file);
-    List<int[]> memo = new ArrayList<>();
-    // 1段目の数値を揃える
-    memo.add(pyramid.get(0));
-
-    long now = System.currentTimeMillis();
-    System.out.println("ファイル読み込みまで" + (now - start) + "ms");
-
-    // 探索
-    search(pyramid);
-    // メモ確認
-    System.out.println("----pyramid----");
-    for (int[] row : pyramid) {
-      for (int i : row) {
-        System.out.print(i + " ");
-      }
-      System.out.println();
-    }
-
-    System.out.println("----結果----");
-    int[] bottom = pyramid.get(pyramid.size() - 1);
-    Arrays.sort(bottom);
-    System.out.println(bottom[bottom.length - 1]);
 
     long end = System.currentTimeMillis();
-    System.out.println("elapsed = " + (end - start) + "ms");
+    System.out.println("ファイル読み込みまで" + (end - start) + "ms");
+
+    start = System.currentTimeMillis();
+    // 頂点から底辺に向かって探索
+    topToBottom(pyramid);
+    // System.out.println("----pyramid----");
+    // for (int[] row : pyramid) {
+    // for (int i : row) {
+    // System.out.print(i + " ");
+    // }
+    // System.out.println();
+    // }
+    // 底辺から最大値を探す一手間が必要
+    int[] bottom = pyramid.get(pyramid.size() - 1);
+    Arrays.sort(bottom);
+    System.out.println();
+    end = System.currentTimeMillis();
+    System.out.println("topToBottom : " + bottom[bottom.length - 1] + ", elapsed : " + (end - start) + "ms");
+
+    // 底辺から頂点に向かって探索
+    List<int[]> pyramid2 = parseFile(file);
+    start = System.currentTimeMillis();
+    bottomToTop(pyramid2);
+    end = System.currentTimeMillis();
+    System.out.println("bottomToTop : " + pyramid2.get(0)[0] + ", elapsed : " + (end - start) + "ms");
+    
   }
 
   private static List<int[]> parseFile(File file) throws IOException {
@@ -79,15 +82,27 @@ public class PyramidRoute {
     return pyramid;
   }
 
-  private static void search(List<int[]> pyramid) {
-    int tempMemory = 0;
+  private static void bottomToTop(List<int[]> pyramid) {
+    for (int i = pyramid.size() - 1; i > 0; i--) {
+      int[] current = pyramid.get(i);
+      int[] next = pyramid.get(i - 1);
+
+      for (int j = 0; j < current.length - 1; j++) {
+        next[j] = Math.max(next[j] + current[j], next[j] + current[j + 1]);
+      }
+    }
+  }
+
+  private static void topToBottom(List<int[]> pyramid) {
+    int tempMemory;
     for (int i = 0; i < pyramid.size() - 1; i++) {
+      tempMemory = 0;
       int[] current = pyramid.get(i);
       int[] next = pyramid.get(i + 1);
+      next[0] = current[0] + next[0];
       for (int j = 0; j < current.length; j++) {
-        if (next[j] < current[j] + tempMemory) {
-          next[j] = current[j] + tempMemory; 
-        }
+        next[j] = Math.max(next[j], current[j] + tempMemory);
+
         tempMemory = next[j + 1];
         next[j + 1] = current[j] + next[j + 1];
       }
