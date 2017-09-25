@@ -28,7 +28,6 @@ import java.util.stream.Stream;
 public class SquareRoute {
 
   public static void main(String[] args) throws Exception {
-    long start = System.currentTimeMillis();
     List<int[]> rows = new ArrayList<>();
     try (Scanner in = new Scanner(System.in);) {
       while (true) {
@@ -47,6 +46,8 @@ public class SquareRoute {
     // }
     // rows.add(row);
     // }
+
+    long start = System.currentTimeMillis();
 
     // 1000*1000にすると1分弱かかる
     final int size = rows.size();
@@ -71,7 +72,7 @@ public class SquareRoute {
     }
 
     long now = System.currentTimeMillis();
-    System.out.println("マス目作成まで" + (now - start) + "ms");
+    System.out.println("経路作成まで" + (now - start) + "ms");
 
     // 行列確認
     System.out.println("----before----");
@@ -83,7 +84,7 @@ public class SquareRoute {
     }
 
     // 探索と結果の出力
-    search();
+    search(diamond, size);
     // 探索後確認
     System.out.println("----after----");
     for (int[] r : diamond) {
@@ -93,17 +94,24 @@ public class SquareRoute {
       System.out.println();
     }
 
-
     System.out.println("----結果----");
-    System.out.println(diamond.get(size - 1)[0]);
+    System.out.println(diamond.get(diamond.size() - 1)[0]);
 
     long end = System.currentTimeMillis();
     System.out.println("elapsed = " + (end - start) + "ms");
   }
 
-  // 左上からの最小合計数をそれぞれのマス位置に埋めていく再帰関数
-  private static void search() {
-
+  /**
+   * ひし形の上半分と下半分で処理を分ける.
+   * 頂点から対角上の頂点までの経路の最大値を探索する。
+   * 結果は、引数のListの末尾の値にセットされる。
+   * 
+   * @param route 探索したい経路
+   * @param size 正方形の辺の長さ
+   */
+  private static void search(List<int[]> route, int size) {
+    topToBottom(route, size);
+    bottomToTop(route, size);
   }
 
   /**
@@ -122,9 +130,9 @@ public class SquareRoute {
    * 
    * @param pyramid
    */
-  private static void topToBottom(List<int[]> pyramid, int rows) {
+  private static void topToBottom(List<int[]> pyramid, int end) {
     int tempMemory;
-    for (int i = 0; i < rows - 1; i++) {
+    for (int i = 0; i < end - 1; i++) {
       tempMemory = 0;
       int[] current = pyramid.get(i);
       int[] next = pyramid.get(i + 1);
@@ -146,8 +154,8 @@ public class SquareRoute {
    * 
    * @param pyramid
    */
-  private static void bottomToTop(List<int[]> pyramid, int rows) {
-    for (int i = rows - 1; i < pyramid.size() - 1; i++) {
+  private static void bottomToTop(List<int[]> pyramid, int start) {
+    for (int i = start - 1; i < pyramid.size() - 1; i++) {
       int[] current = pyramid.get(i);
       int[] next = pyramid.get(i + 1);
 
